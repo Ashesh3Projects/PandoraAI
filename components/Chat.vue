@@ -517,73 +517,62 @@ if (!process.server) {
 
 <template>
     <client-only>
-        <ClientSettings
-            :is-open="isClientSettingsModalOpen"
-            :set-is-open="setIsClientSettingsModalOpen"
-            :client="clientSettingsModalClient"
-            :preset-name="clientSettingsModalPresetName"
-        />
+        <ClientSettings :is-open="isClientSettingsModalOpen" :set-is-open="setIsClientSettingsModalOpen"
+            :client="clientSettingsModalClient" :preset-name="clientSettingsModalPresetName" />
     </client-only>
     <div class="flex flex-col flex-grow items-center relative">
         <!--suppress CssInvalidPropertyValue -->
-        <div
-            ref="messagesContainerElement"
-            class="overflow-y-auto w-full rounded-sm pb-12 px-3"
-            style="overflow: overlay;"
-        >
+        <div ref="messagesContainerElement" class="overflow-y-auto w-full rounded-sm pb-12 px-3" style="overflow: overlay;">
             <TransitionGroup name="messages">
-                <div
-                    class="max-w-4xl w-full mx-auto message"
-                    v-for="(message, index) in messages"
-                    :key="message.id || index"
-                >
-                    <div
-                        class="p-3 rounded-sm"
-                        :class="{
-                            'bg-white/10 shadow': message.role === 'bot',
-                        }"
-                    >
+                <div class="mb-4 max-w-4xl w-full mx-auto message" v-for="(message, index) in messages" :key="index">
+                    <div class="m-2 p-4 rounded-xl" :class="{
+                        'bg-[#2f2f2f] backdrop-blur-sm shadow rounded-xl': message.role === 'bot',
+                        'border-white border-[1px]': message.role === 'user',
+                    }">
                         <!-- role name -->
-                        <div
-                            class="text-xs text-white/50 mb-1"
-                        >
+                        <div class="mb-3">
                             <template v-if="message.role === 'bot'">
-                                {{ activePresetToUse?.options?.clientOptions?.chatGptLabel || 'AI' }}
+                                <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24"
+                                    data-testid="SmartToyOutlinedIcon"
+                                    style="user-select: none; width: 1em; height: 1em; display: inline-block; fill: currentcolor; flex-shrink: 0; transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; font-size: 1.5rem;">
+                                    <path
+                                        d="M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zm-2 10H6V7h12v12zm-9-6c-.83 0-1.5-.67-1.5-1.5S8.17 10 9 10s1.5.67 1.5 1.5S9.83 13 9 13zm7.5-1.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zM8 15h8v2H8v-2z">
+                                    </path>
+                                </svg>
                             </template>
                             <template v-else-if="message.role === 'user'">
-                                {{ activePresetToUse?.options?.clientOptions?.userLabel || 'User' }}
+                                <svg focusable="false" aria-hidden="true" viewBox="0 0 24 24"
+                                    data-testid="AccountCircleOutlinedIcon"
+                                    style="user-select: none; width: 1em; height: 1em; display: inline-block; fill: currentcolor; flex-shrink: 0; transition: fill 200ms cubic-bezier(0.4, 0, 0.2, 1) 0ms; font-size: 1.5rem;">
+                                    <path
+                                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM7.35 18.5C8.66 17.56 10.26 17 12 17s3.34.56 4.65 1.5c-1.31.94-2.91 1.5-4.65 1.5s-3.34-.56-4.65-1.5zm10.79-1.38C16.45 15.8 14.32 15 12 15s-4.45.8-6.14 2.12C4.7 15.73 4 13.95 4 12c0-4.42 3.58-8 8-8s8 3.58 8 8c0 1.95-.7 3.73-1.86 5.12z">
+                                    </path>
+                                    <path
+                                        d="M12 6c-1.93 0-3.5 1.57-3.5 3.5S10.07 13 12 13s3.5-1.57 3.5-3.5S13.93 6 12 6zm0 5c-.83 0-1.5-.67-1.5-1.5S11.17 8 12 8s1.5.67 1.5 1.5S12.83 11 12 11z">
+                                    </path>
+                                </svg>
                             </template>
                             <template v-else>
                                 {{ message.role }}
                             </template>
                         </div>
                         <!-- message text -->
-                        <div
-                            class="prose prose-sm prose-chatgpt break-words max-w-6xl"
-                            v-html="(message.role === 'user' || message.raw) ? parseMarkdown(message.text) : parseMarkdown(message.text, true)"
-                        />
+                        <div class="prose-chatgpt break-words max-w-6xl"
+                            v-html="(message.role === 'user' || message.raw) ? parseMarkdown(message.text) : parseMarkdown(message.text, true)" />
                     </div>
                 </div>
             </TransitionGroup>
         </div>
-        <div
-            ref="inputContainerElement"
-            class="mx-auto w-full max-w-4xl px-3 xl:px-0 flex flex-row absolute left-0 right-0 mb-7 sm:mb-0 z-10"
-        >
+        <div ref="inputContainerElement"
+            class="mx-auto w-full max-w-4xl px-3 xl:px-0 flex flex-row absolute left-0 right-0 mb-7 sm:mb-0 z-10">
             <div class="relative flex flex-row w-full justify-center items-stretch rounded shadow">
-                <div
-                    ref="chatButtonsContainerElement"
+                <div ref="chatButtonsContainerElement"
                     class="flex gap-2 mb-3 items-stretch justify-center absolute bottom-full"
-                    :class="{ 'w-full': !processingController }"
-                >
-                    <button
-                        v-if="processingController"
-                        @click="stopProcessing"
-                        class="
-                            flex-1 py-2 px-5 bg-white/10 text-slate-300 text-sm
-                            shadow rounded transition duration-300 ease-in-out hover:bg-white/20
-                        "
-                    >
+                    :class="{ 'w-full': !processingController }">
+                    <button v-if="processingController" @click="stopProcessing" class="
+                                flex-1 py-2 px-5 bg-white/10 backdrop-blur-sm text-white text-sm
+                                shadow rounded transition duration-300 ease-in-out hover:bg-white/20
+                            ">
                         Stop
                     </button>
                     <button
@@ -599,16 +588,13 @@ if (!process.server) {
                     </button>
                 </div>
                 <Transition name="slide-from-bottom">
-                    <ClientDropdown
-                        v-if="isClientDropdownOpen"
-                        :preset-name="activePresetNameToUse"
+                    <ClientDropdown v-if="isClientDropdownOpen" :preset-name="activePresetNameToUse"
                         :set-client-to-use="setActivePresetName"
                         :set-is-client-settings-modal-open="setIsClientSettingsModalOpen"
                         :can-change-preset="canChangePreset"
                     />
                 </Transition>
-                <button
-                    @click="isClientDropdownOpen = !isClientDropdownOpen"
+                <button @click="isClientDropdownOpen = !isClientDropdownOpen"
                     class="flex items-center w-10 h-10 my-auto ml-2 justify-center absolute left-0 top-0 bottom-0 z-10"
                 >
                     <Transition name="fade" mode="out-in">
@@ -617,8 +603,7 @@ if (!process.server) {
                             class="w-10 h-10 p-2 block transition duration-300 ease-in-out rounded-lg hover:bg-black/30 cursor-pointer hover:shadow"
                             :class="{
                                 'bg-black/30 shadow': isClientDropdownOpen,
-                            }"
-                        />
+                            }" />
                         <GPTIcon
                             v-else-if="activePresetNameToUse === 'chatgpt-browser' || activePresetToUse?.client === 'chatgpt-browser'"
                             class="w-10 h-10 p-2 text-[#6ea194] block transition duration-300 ease-in-out
@@ -632,8 +617,7 @@ if (!process.server) {
                             class="w-10 h-10 p-2 block transition duration-300 ease-in-out rounded-lg hover:bg-black/30 cursor-pointer hover:shadow"
                             :class="{
                                 'bg-black/30 shadow': isClientDropdownOpen,
-                            }"
-                        />
+                            }" />
                     </Transition>
                 </button>
                 <textarea
@@ -692,14 +676,17 @@ if (!process.server) {
 </template>
 
 <style>
-.messages-move, /* apply transition to moving elements */
+.messages-move,
+/* apply transition to moving elements */
 .messages-enter-active {
     transition: all 0.3s ease;
 }
+
 .messages-enter-from {
     opacity: 0;
     transform: translateY(0);
 }
+
 /* ensure leaving items are taken out of layout flow so that moving
    animations can be calculated correctly. */
 .messages-leave-active {
@@ -708,9 +695,10 @@ if (!process.server) {
 }
 
 .slide-from-bottom-enter-active,
-.slide-from-bottom-leave-active{
+.slide-from-bottom-leave-active {
     transition: all 0.3s ease;
 }
+
 .slide-from-bottom-enter-from,
 .slide-from-bottom-leave-to {
     transform: translateY(30px);
@@ -731,7 +719,7 @@ if (!process.server) {
 }
 
 .prose pre code .hljs-comment {
-    @apply text-slate-500;
+    @apply text-white;
 }
 
 .prose p {
@@ -751,6 +739,7 @@ input[type="range"]:focus {
 input[type="range"]::-webkit-slider-runnable-track {
     @apply h-1 bg-white/10 rounded w-full;
 }
+
 input[type="range"]::-moz-range-track {
     @apply h-1 bg-white/10 rounded w-full;
 }
